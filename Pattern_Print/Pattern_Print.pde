@@ -1,3 +1,5 @@
+//Code written with support of Chris Ball www.chrisballprojects.co.uk July 1
+
 import processing.serial.*;
 
 Serial thermal;
