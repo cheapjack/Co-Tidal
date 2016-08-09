@@ -31,48 +31,116 @@ const int kFourthDigitOnePin = 43;
 const int kMinYearDigitPin = 40;
 const int kMaxYearDigitPin = 53;
 
+// Analog pin to which the month carousel is connected
+const int kMonthPin = A0;
+const int kMonthThresholds[12] = { 930, 840, 752, 658, 556, 446, 344, 241, 146, 51, 3, 0 };
+// Max and min analog values for the extremes of the carousel's travel
+const int kMinCalendar = 10;
+const int kMaxCalendar = 1010;
+
+// "Take a reading" button details
+// Expects a button which will pull the pin to ground when pressed
+const int kButtonPin = 6;
+unsigned long gButtonPressedTime;
+int gLastButtonState = HIGH;
+const int kButtonDebounce = 50;
+
+// Status LED details
+const int kLEDPin = 7;
+
+#define PRINTER Serial2
+
 void setup() {
   // Start serial
   Serial.begin(115200);
   delay(100);
 
+  // Set up the printer
+  PRINTER.begin(9600);
+
   // Configure year pins as inputs and enable the internal pull-up resistors
   for (int i = kMinYearDigitPin; i <= kMaxYearDigitPin; i++){
     pinMode(i, INPUT_PULLUP);
   }
-  //setup onboard LED in case
-  pinMode(13, OUTPUT);
+  pinMode(kButtonPin, INPUT_PULLUP);
+  
+  // Setup status LED
+  pinMode(kLEDPin, OUTPUT);
+  digitalWrite(kLEDPin, HIGH);
+  
+#ifdef DEBUG
   Serial.println("Let's go!");
+#endif
 }
 
 void loop() {
-  int digit = 0;
-  int year = 0;
-  if (digitalRead(kFirstDigitOnePin) == LOW)
+  // Check for the button being pressed
+  int buttonState = digitalRead(kButtonPin);
+  if ((buttonState == LOW) && (gLastButtonState != LOW))
   {
-    digit = 1;
+    // Button has been pressed, start timing when that happened
+    gButtonPressedTime = millis();
   }
-  if (digitalRead(kFirstDigitTwoPin) == LOW)
+  else if ( (buttonState == HIGH) && 
+            (gLastButtonState == LOW) &&
+            ((millis() - gButtonPressedTime) > kButtonDebounce) )
   {
-    digit = 2;
+    // Button has been released (and was down long enough to be
+    // a proper button press)
+
+    // Read in the month
+    int sensorValue = analogRead(kMonthPin);
+    int month = 0;
+    while (sensorValue < kMonthThresholds[month])
+    {
+      month++;
+    }
+    month++; // The array is 0-based, we want 1-based
+  
+    // print the results to the serial monitor:
+#ifdef DEBUG
+    Serial.print("sensor = " );
+    Serial.print(sensorValue);
+    Serial.print("\t month = ");
+    Serial.println(month);
+#endif
+    
+    // Read in what the year is
+    int digit = 0;
+    int year = 0;
+    if (digitalRead(kFirstDigitOnePin) == LOW)
+    {
+      digit = 1;
+    }
+    if (digitalRead(kFirstDigitTwoPin) == LOW)
+    {
+      digit = 2;
+    }
+    year = digit;
+    digit = readBinaryEncodedDigit(kSecondDigitOnePin, 4, -1);
+    year = (year * 10) + digit;
+    digit = readBinaryEncodedDigit(kThirdDigitOnePin, 4, -1);
+    year = (year * 10) + digit;
+    digit = readBinaryEncodedDigit(kFourthDigitOnePin, 4, -1);
+    year = (year * 10) + digit;
+#ifdef DEBUG
+    Serial.print("Year: ");
+    Serial.println(year);
+#endif
+
+    // Report it
+    Serial.print(month);
+    Serial.print("-");
+    Serial.println(year);
   }
-  Serial.print("1st digit: ");
-  Serial.println(digit);
-  year = digit;
-  Serial.print("2nd digit: ");
-  digit = readBinaryEncodedDigit(kSecondDigitOnePin, 4, -1);
-  year = (year * 10) + digit;
-  Serial.println(digit);
-  Serial.print("3rd digit: ");
-  digit = readBinaryEncodedDigit(kThirdDigitOnePin, 4, -1);
-  year = (year * 10) + digit;
-  Serial.println(digit);
-  Serial.print("4th digit: ");
-  digit = readBinaryEncodedDigit(kFourthDigitOnePin, 4, -1);
-  year = (year * 10) + digit;
-  Serial.println(digit);
-  Serial.print("Year: ");
-  Serial.println(year);
+  gLastButtonState = buttonState;
+
+  // Send any data to the printer
+  while (Serial.available())
+  {
+    PRINTER.write(Serial.read());
+  }
+  
 #if 0
   //read the pushbutton value into a byte variable
   byte sensorVal = digitalRead(2);
@@ -142,8 +210,8 @@ void loop() {
       break;
     }
 #endif
-  Serial.println();
-  delay(8000);
+  //Serial.println();
+  //delay(8000);
 }
 
 // Read in a value from a binary-encoded rotary dial
