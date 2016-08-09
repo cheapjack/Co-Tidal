@@ -22,19 +22,58 @@
 
 */
 
+// Pins that the year digits are connected to
+const int kFirstDigitOnePin = 53;
+const int kFirstDigitTwoPin = 52;
+const int kSecondDigitOnePin = 51;
+const int kThirdDigitOnePin = 47;
+const int kFourthDigitOnePin = 43;
+const int kMinYearDigitPin = 40;
+const int kMaxYearDigitPin = 53;
+
 void setup() {
-  //start serial
-  Serial.begin(9600);
-  //configure pin2-5 as inputs and enable the internal pull-up resistors
-  for (int i = 2; i < 6; i++){
+  // Start serial
+  Serial.begin(115200);
+  delay(100);
+
+  // Configure year pins as inputs and enable the internal pull-up resistors
+  for (int i = kMinYearDigitPin; i <= kMaxYearDigitPin; i++){
     pinMode(i, INPUT_PULLUP);
   }
   //setup onboard LED in case
   pinMode(13, OUTPUT);
-
+  Serial.println("Let's go!");
 }
 
 void loop() {
+  int digit = 0;
+  int year = 0;
+  if (digitalRead(kFirstDigitOnePin) == LOW)
+  {
+    digit = 1;
+  }
+  if (digitalRead(kFirstDigitTwoPin) == LOW)
+  {
+    digit = 2;
+  }
+  Serial.print("1st digit: ");
+  Serial.println(digit);
+  year = digit;
+  Serial.print("2nd digit: ");
+  digit = readBinaryEncodedDigit(kSecondDigitOnePin, 4, -1);
+  year = (year * 10) + digit;
+  Serial.println(digit);
+  Serial.print("3rd digit: ");
+  digit = readBinaryEncodedDigit(kThirdDigitOnePin, 4, -1);
+  year = (year * 10) + digit;
+  Serial.println(digit);
+  Serial.print("4th digit: ");
+  digit = readBinaryEncodedDigit(kFourthDigitOnePin, 4, -1);
+  year = (year * 10) + digit;
+  Serial.println(digit);
+  Serial.print("Year: ");
+  Serial.println(year);
+#if 0
   //read the pushbutton value into a byte variable
   byte sensorVal = digitalRead(2);
   byte sensorVal2 = digitalRead(3);
@@ -102,10 +141,39 @@ void loop() {
       Serial.print("Velg dato vennligst!");
       break;
     }
-
+#endif
   Serial.println();
-  delay(1000);
+  delay(8000);
 }
+
+// Read in a value from a binary-encoded rotary dial
+// Assumes the pin is LOW when selected
+// Assumes the pins are all wired up sequentially
+//
+// Parameters:
+//   aOnePin - pin that the 1 bit is wired to
+//   aNumBits - how many bits this encoder has
+//   aPinSequenceDirection - value to add to a pin to get to the
+//                           next bit's pin.  Usually 1, but -1
+//                           if your bits are wired "backwards"
+// Returns the value read in
+int readBinaryEncodedDigit(int aOnePin, int aNumBits, int aPinSequenceDirection)
+{
+  int ret = 0;
+  for (int i = 0; i < aNumBits; i++)
+  {
+    // Read in this bit
+    int bitValue = digitalRead(aOnePin+(i*aPinSequenceDirection));
+    //Serial.print(aOnePin+(i*aPinSequenceDirection));
+    //Serial.print(": ");
+    //Serial.println(bitValue);
+    // And add it to the value
+    // (using "|" the bitwise OR, and "<<" to shift the bit into the right place)
+    ret = ret | (bitValue << i);
+  }
+  return ret;
+}
+
 /*
   // Keep in mind the pullup means the pushbutton's
   // logic is inverted. It goes HIGH when it's open,
