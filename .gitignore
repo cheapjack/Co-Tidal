@@ -87,3 +87,7 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+# Co~Tidal sketch output
+*-results.json
+*-out.png
