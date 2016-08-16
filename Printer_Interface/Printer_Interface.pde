@@ -18,6 +18,9 @@ String[] output;
 // Oslo
 float Latitude=59.903792;
 float Longitude=10.700992;
+//Porjus
+//float Latitude=66.9592431;
+//float Longitude=18.7011674;
 // Bangkok
 //float Latitude=13.7543;
 //float Longitude=100.4931;
@@ -26,7 +29,7 @@ void setup(){
   size(960, 620);  // size always goes first!
   //  thermal=new Serial(this,"/dev/cu.usbmodem1421",19200);
   thermalCutter=new Serial(this,"/dev/ttyACM0",115200);
-  thermalContinuous=new Serial(this,"/dev/ttyACM2",19200);
+  thermalContinuous=new Serial(this,"/dev/ttyACM1",19200);
   thermalCutter.write("\n\n");
   thermalContinuous.write("\n\n");
   delay(1000);
