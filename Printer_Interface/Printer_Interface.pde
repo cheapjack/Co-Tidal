@@ -97,9 +97,9 @@ void draw() {
       String[] JSONTable=new String[1];
       JSONTable[0] =  Results[0].substring(start, end+1);
     
-      saveStrings(year+"-"+month+"-results.json", JSONTable);
+      saveStrings("results/"+year+"-"+month+"-results.json", JSONTable);
     
-      JSONArray TideData=loadJSONArray(year+"-"+month+"-results.json");
+      JSONArray TideData=loadJSONArray("results/"+year+"-"+month+"-results.json");
     
       for (int i = 0; i < TideData.size(); i++) { //for loop
     
@@ -140,7 +140,7 @@ void draw() {
           }
         }
       }
-      outImg.save(year+"-"+month+"-out.png");
+      outImg.save("results/"+year+"-"+month+"-out.png");
       // Display the output
       outImg.resize(displayScale*scaleX,displayScale*scaleY);
       image(outImg,displayScale*scaleX,0);

@@ -89,5 +89,5 @@ ENV/
 .ropeproject
 
 # Co~Tidal sketch output
-*-results.json
-*-out.png
+results/*-results.json
+results/*-out.png
