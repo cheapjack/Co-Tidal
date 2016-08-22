@@ -13,7 +13,7 @@ These instructions all assume some sort of Unix-like shell.  Bash, the default o
 
 ## Counts Per Year
 
-    ls *.png | cut -d - -f 1 | sort | uniq -c > years-summary.csv
+    ls *out.png | cut -d - -f 1 | sort | uniq -c > years-summary.csv
 
 Explanation:
  * `ls *.png` - list all the image files
@@ -38,7 +38,7 @@ This doesn't actually result in a CSV file, but converting it to one is pretty t
 
  1. If you like, you can switch the count and year columns in vim too.  Or if it's easier, open the CSV file in a spreadsheet and switch them there.
 
-    `:g//s/\(\d\+\),\(\d\+\)/\2,\1/`
+    `:g/\d/s/\(\d\+\),\(\d\+\)/\2,\1/`
 
  1. Save the file and exit vim.
 
@@ -96,7 +96,7 @@ Create a grid of patterns, with each row containing 12 patterns&mdash;one for ea
                 echo "null: \\"
             fi
         done
-        echo " -geometry 24x31 -background black -tile x1 -mode Concatentate full-$year.png"
+        echo " -geometry 24x31 -background black -tile x1 -mode Concatenate full-$year.png"
     done > generate_years
 ```
 
@@ -113,7 +113,7 @@ Create a grid of patterns, with each row containing 12 patterns&mdash;one for ea
 ```
     for year in {1938..2019}
     do
-        if [[ -f full-$year.png" ]]; then
+        if [[ -f "full-$year.png" ]]; then
             echo "full-$year.png \\"
         else
             echo "null: \\"
