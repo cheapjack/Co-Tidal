@@ -72,7 +72,7 @@ Generate a histogram of the number of patterns generated each year, by grouping 
 
  1. Create a montage of all the histogram-year.png images generated in the previous step.  `-tile 1x` puts them into a single column.  `-geometry '1x1+5-9<'` gives a 5 pixel border left and right, and removes the 9 pixels of padding the previous montage generates.
 
-    `montage histogram-*.png -mode Concatenate -tile 1x -geometry '1x1+5-9<' years-histogram.png`
+    `montage null: histogram-*.png -mode Concatenate -tile 1x -geometry '1x1+5-9<' years-histogram.png`
 
  1. Remove the intermediate image files (optional)
 
