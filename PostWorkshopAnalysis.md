@@ -13,7 +13,7 @@ These instructions all assume some sort of Unix-like shell.  Bash, the default o
 
 ## Counts Per Year
 
-    `ls *.png | cut -d - -f 1 | sort | uniq -c > years-summary.csv`
+    ls *.png | cut -d - -f 1 | sort | uniq -c > years-summary.csv
 
 Explanation:
  * `ls *.png` - list all the image files
@@ -52,11 +52,11 @@ Given we've got an image of each month's pattern, it would be nice to generate a
 
 Generate a block of all the patterns, arranged in rows and columns as `montage` sees fit.
 
-    `montage *out.png -mode Concatenate -background black all-patterns.png`
+    montage *out.png -mode Concatenate -background black all-patterns.png
 
 To make each pattern twice as large...
 
-    `montage *out.png -resize 200%x200% -mode Concatenate -background black all-patterns.png`
+    montage *out.png -resize 200%x200% -mode Concatenate -background black all-patterns.png
 
 ### Year Count Pattern Histogram
 
